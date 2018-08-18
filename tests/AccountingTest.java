@@ -6,13 +6,14 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
 
 public class AccountingTest {
-    Accounting accounting;
+    private Accounting accounting;
 
     @Mock
     IBudgetRepository repository;
@@ -25,22 +26,31 @@ public class AccountingTest {
 
     @Test
     public void no_Budget() {
-        amountShouldBe(0.0, stringToDate("20180301"), stringToDate("20180301"));
+        amountShouldBe(0.0, "20180301", "20180301");
 
     }
 
     @Test
     public void period_Inside_Budget_Month() {
 
-        List<Budget> budgets = new ArrayList<Budget>();
-        budgets.add(new Budget("201801", 31));
-        when(repository.getAll()).thenReturn(budgets);
-        amountShouldBe(1.0, stringToDate("20180301"), stringToDate("20180301"));
+        givenBudgets(Collections.singletonList(new Budget("201801", 31)));
+        amountShouldBe(1.0, "20180301", "20180301");
     }
 
-    private void amountShouldBe(double expected, LocalDate start, LocalDate end) {
+//    @Test
+//    public void period_No_Overlap_Budget_LastDay() {
+//
+//        givenBudgets(Collections.singletonList(new Budget("201801", 31)));
+//        amountShouldBe(0.0, "20180401", "20180401");
+//    }
 
-        double totalAmount = accounting.totalAmount(start, end);
+    private void givenBudgets(List<Budget> budgets) {
+        when(repository.getAll()).thenReturn(budgets);
+    }
+
+    private void amountShouldBe(double expected, String start, String end) {
+
+        double totalAmount = accounting.totalAmount(stringToDate(start), stringToDate(end));
         Assert.assertEquals(expected, totalAmount, 0.0);
     }
 

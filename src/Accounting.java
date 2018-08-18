@@ -12,10 +12,33 @@ public class Accounting {
 
     public double totalAmount(LocalDate start, LocalDate end) {
         List<Budget> budgets = repository.getAll();
+        Period period = new Period(start, end);
         if (!budgets.isEmpty()) {
-            return ((Duration.between(start.atStartOfDay(), end.atStartOfDay()).toDays() + 1));
+            return period.days();
         }
 
         return 0;
+    }
+
+    private static class Period {
+        private final LocalDate start;
+        private final LocalDate end;
+
+        private Period(LocalDate start, LocalDate end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public LocalDate getStart() {
+            return start;
+        }
+
+        public LocalDate getEnd() {
+            return end;
+        }
+
+        private double days() {
+            return ((Duration.between(getStart().atStartOfDay(), getEnd().atStartOfDay()).toDays() + 1));
+        }
     }
 }
